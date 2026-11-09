@@ -112,14 +112,14 @@ last tracker click: table: 0000026AB66BEE00 id=nil sent=false
 | `blizzard_objectivetracker/blizzard_questobjectivetracker.lua:20、51-132` | `QuestObjectiveTrackerMixin` 由 `CreateFromMixins` 生成；`OnBlockHeaderClick(block, mouseButton)` 左键打开任务详情、右键弹菜单（含放弃） |
 | `blizzard_objectivetracker/blizzard_objectivetrackermodule.lua:254-272` | `GetBlock(id)` 中 `block.id = id`，任务是 `questID` |
 
-快照与哈希见 `references/wow-ui/wowf/70790/PROVENANCE.md`。
+证据取自客户端 CASC 的 `interface/addons/…` 段（`wowf` build 70790）：`Blizzard_ObjectiveTracker`、`Blizzard_UIPanels_Game.toc`、`blizzard_apidocumentationgenerated/questlogdocumentation.lua`。
 
 ## 验证状态
 
 已完成（静态）：
 
 - `lua5.1 -e "loadfile(...)"` → `SYNTAX OK`
-- 假客户端环境夹具 `_tmpdt/qaf-forever-fixture.lua` → `FIXTURE OK`，两轮独立客户端覆盖：
+- 假客户端环境夹具（本地脚本，不随仓库发布）→ `FIXTURE OK`，两轮独立客户端覆盖：
   1. 轮 A（只有 header mixin）：任务 UI 未加载时安装器不抛错、`/qaf` 报 `not installed`；`QuestMapLogTitleButton_OnClick` 出现后 Alt+左键放一次；未按 Alt 不放；不可放弃任务不放；header 的 `LeftButton` / `LeftButtonUp` 都放、`RightButton` 不放。
   2. 轮 B（模块帧可用）：帧 + mixin 都 hook、header 兜底不安装；帧的 `LeftButtonUp` / `LeftButton` 都放、`RightButtonUp` 不放、不可放弃块不放；同一次点击同时被帧和 mixin 看到时只放一次（去重窗口）；`last tracker click` 诊断行内容正确；重复事件触发不重复挂 hook（幂等）。
 
@@ -136,7 +136,7 @@ last tracker click: table: 0000026AB66BEE00 id=nil sent=false
 未完成（需游戏内）：
 
 - 1.0.3 的追踪器修复尚未在客户端复验。
-- `QuestMapLogTitleButton_OnClick` 使用 `self.questID` 的字段契约无法本地核对（游戏内已证明可用）。2026-11-05 复测 CASC：`interface/framexml/*` 的 750 条 listfile 候选在 `wowf` **与** `wow` 上 `--verify` 全部失败（`questmapframe.lua`、`questlogframe.lua`、`uiparent.lua` 皆不可读），因此这是本机安装的下发范围问题，不是 Forever 分支差异；`interface/addons/*` 段可读，上述依据都来自该段。
+- `QuestMapLogTitleButton_OnClick` 使用 `self.questID` 的字段契约无法从 CASC 直接核对（游戏内已证明可用）。2026-11-05 复测：`interface/framexml/*` 的 750 条 listfile 候选在 `wowf` **与** `wow` 上 `--verify` 全部失败（`questmapframe.lua`、`questlogframe.lua`、`uiparent.lua` 皆不可读），因此这属于客户端数据下发范围的共性，不是 Forever 分支差异；可读的是 `interface/addons/*` 段，上述依据都来自该段。
 - `[Game]` 段对应 `camelot` 目录属间接推断（依据：`camelot/blizzard_questobjectivetrackeroverride.lua` 存在，且 `Blizzard_ObjectiveTracker.toc:36` 用 `[AllowLoadGameType camelot]` 加载它）。
 
 游戏内确认方法：`/reload` 后执行 `/qaf`，应看到
@@ -154,9 +154,7 @@ last tracker click: LeftButtonUp id=<任务ID> sent=true argc=3 types=table,tabl
 
 ## 安装
 
-将 `QuickAbandonFixedForever` 目录放入 `_forever_\Interface\AddOns\`，然后 `/reload`。
-
-本工作区当前的部署形态（2026-11-06）：`_forever_\Interface\AddOns\QuickAbandonFixedForever` 是指向 `F:\Projects\WoWDev\deploy\QuickAbandonFixedForever` 的 Junction，源为 `addons\QuickAbandonFixedForever`；部署清单与三处哈希记录在 `state\deploy-backups\QuickAbandonFixedForever\`。改动源码后重跑一次 deploy 复制即可，live 通过 Junction 立即看到新文件，随后 `/reload` 生效。
+将 `QuickAbandonFixedForever` 目录放入 `_forever_\Interface\AddOns\`，然后 `/reload`。目录需包含 `QuickAbandonFixedForever.toc`、`QuickAbandonFixedForever.lua` 和 `Resources` 文件夹。
 
 ## 回滚
 
