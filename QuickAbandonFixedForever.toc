@@ -1,0 +1,11 @@
+## Interface: 16001
+## Title: Quick Abandon (Forever)
+## Title-zhCN: 快速放弃（Forever）
+## Version: 1.0.3
+## Author: SirJ0K3R
+## Notes: Hold Alt and click a quest in the quest log or its objective tracker header to abandon it immediately.
+## Notes-zhCN: 按住 Alt 点击任务日志或目标追踪标题，直接放弃该任务。
+## IconTexture: Interface\AddOns\QuickAbandonFixedForever\Resources\QuickAbandonFixedForever-32.tga
+## AllowLoadGameType: camelot
+
+QuickAbandonFixedForever.lua
